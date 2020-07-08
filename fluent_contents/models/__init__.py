@@ -167,7 +167,7 @@ class ContentItemOutput(SafeData):
         self.cacheable = True  # Implied by retrieving from cache.
         self.cache_timeout = DEFAULT_TIMEOUT
 
-        if not css and not js:
+        if not (css or js):
             self.media = ImmutableMedia.empty_instance
         else:
             if django.VERSION >= (2, 2):

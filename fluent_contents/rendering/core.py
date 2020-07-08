@@ -145,9 +145,10 @@ class ResultTracker(object):
                 output = self.MISSING
             else:
                 # Filter exceptions out.
-                if not include_exceptions:
-                    if isinstance(output, Exception) or output is self.SKIPPED:
-                        continue
+                if not include_exceptions and (
+                    isinstance(output, Exception) or output is self.SKIPPED
+                ):
+                    continue
 
             ordered_output.append((contentitem, output))
 
@@ -245,7 +246,9 @@ class RenderingPipe(object):
         The items are 'non-polymorphic', so only point to their base class.
         If these are found, there is no need to query the derived data from the database.
         """
-        if not appsettings.FLUENT_CONTENTS_CACHE_OUTPUT or not self.use_cached_output:
+        if not (
+            appsettings.FLUENT_CONTENTS_CACHE_OUTPUT and self.use_cached_output
+        ):
             result.add_remaining_list(items)
             return
 
@@ -268,7 +271,7 @@ class RenderingPipe(object):
                 output = plugin.get_cached_output(result.placeholder_name, contentitem)
 
                 # Support transition to new output format.
-                if output is not None and not isinstance(output, ContentItemOutput):
+                if not (output is None or isinstance(output, ContentItemOutput)):
                     output = None
                     logger.debug(
                         "Flushed cached output of {0}#{1} to store new ContentItemOutput format (key: {2})".format(

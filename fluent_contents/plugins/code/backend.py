@@ -1,6 +1,7 @@
 """
 Using pygments to render the code.
 """
+
 from django.utils.translation import ugettext as _
 from pygments import highlight, styles
 from pygments.formatters.html import HtmlFormatter
@@ -18,8 +19,9 @@ _languageChoices = [
 _languageChoices.sort(key=lambda x: x[1].lower())
 
 LANGUAGE_CHOICES = tuple(
-    [t for t in _languageChoices if t[0] in appsettings.FLUENT_CODE_SHORTLIST]
+    t for t in _languageChoices if t[0] in appsettings.FLUENT_CODE_SHORTLIST
 )
+
 if not appsettings.FLUENT_CODE_SHORTLIST_ONLY:
     LANGUAGE_CHOICES += (
         (_("Combinations"), [t for t in _languageChoices if "+" in t[0]]),

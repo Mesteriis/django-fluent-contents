@@ -232,11 +232,7 @@ class PlaceholderField(PlaceholderRelation):
 
         # Configure the revere relation if possible.
         # TODO: make sure reverse queries work properly
-        if django.VERSION >= (1, 11):
-            rel = self.remote_field
-        else:
-            rel = self.rel
-
+        rel = self.remote_field if django.VERSION >= (1, 11) else self.rel
         if rel.related_name is None:
             # Make unique for model (multiple models can use same slotnane)
             rel.related_name = "{app}_{model}_{slot}_FIXME".format(

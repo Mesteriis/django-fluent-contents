@@ -285,7 +285,7 @@ def get_parent_active_language_choices(parent_object, exclude_current=False):
         except KeyError:
             lang_dict = ()
 
-        allowed_languages = set(item["code"] for item in lang_dict)
+        allowed_languages = {item["code"] for item in lang_dict}
         languages &= allowed_languages
 
     # No multithreading issue here, object is instantiated for this user only.
