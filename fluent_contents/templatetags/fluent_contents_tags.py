@@ -408,7 +408,7 @@ class RenderContentItemsMedia(BaseNode):
         request = self.get_request(context)
 
         media = rendering.get_frontend_media(request)
-        if not media or not (media._js or media._css):
+        if not (media and ((media._js or media._css))):
             return u""
 
         if not media_type:
@@ -448,11 +448,7 @@ def _split_js(media, domain):
         return ImmutableMedia.empty_instance
 
     needs_local = domain == "local"
-    new_js = []
-    for url in media._js:
-        if needs_local == _is_local(url):
-            new_js.append(url)
-
+    new_js = [url for url in media._js if needs_local == _is_local(url)]
     if not new_js:
         return ImmutableMedia.empty_instance
     else:

@@ -67,7 +67,7 @@ class ContentPluginPanel(Panel):
         self.num_placeholders = 0
         for resulttracker in collector.get_collection():
             rendered_items = []
-            retreived_items = set(item.pk for item in resulttracker.remaining_items)
+            retreived_items = {item.pk for item in resulttracker.remaining_items}
             for contentitem, output in resulttracker.get_output(
                 include_exceptions=True
             ):
@@ -115,8 +115,8 @@ class ContentPluginPanel(Panel):
                         templates = plugin.get_render_template(request, contentitem)
                         template_dummy = False
 
-                    if templates is not None and not isinstance(
-                        templates, (list, tuple)
+                    if not (
+                        templates is None or isinstance(templates, (list, tuple))
                     ):
                         templates = [templates]
 
@@ -126,13 +126,13 @@ class ContentPluginPanel(Panel):
                     elif output is ResultTracker.SKIPPED:
                         status = "skipped"
                     else:
-                        if not is_cached:
-                            status = "fetched"
-                            cache_timeout = output.cache_timeout
-                        else:
+                        if is_cached:
                             status = "cached"
                             cache_timeout = plugin.cache_timeout
 
+                        else:
+                            status = "fetched"
+                            cache_timeout = output.cache_timeout
                         cache_timeout = (
                             None
                             if isinstance(cache_timeout, object)

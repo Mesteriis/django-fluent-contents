@@ -42,7 +42,7 @@ class SearchRenderingPipe(PlaceholderRenderingPipe):
         Render the item - but render as search text instead.
         """
         plugin = contentitem.plugin
-        if not plugin.search_output and not plugin.search_fields:
+        if not (plugin.search_output or plugin.search_fields):
             # Only render items when the item was output will be indexed.
             raise SkipItem
 
@@ -65,10 +65,7 @@ class SearchRenderingPipe(PlaceholderRenderingPipe):
 
     def merge_output(self, result, items, template_name):
         # Collect all individual rendered items.
-        html_output = []
-        for contentitem, output in result.get_output():
-            html_output.append(output.html)
-
+        html_output = [output.html for contentitem, output in result.get_output()]
         # since media is not included, cachable is false
         merged_html = mark_safe(u"".join(html_output))
         return ContentItemOutput(merged_html, cacheable=False)

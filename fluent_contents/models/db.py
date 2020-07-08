@@ -169,7 +169,7 @@ class Placeholder(models.Model):
         Return the URL of the parent object, if it has one.
         This method mainly exists to support cache mechanisms (e.g. refreshing a Varnish cache), and assist in debugging.
         """
-        if not self.parent_id or not self.parent_type_id:
+        if not (self.parent_id and self.parent_type_id):
             return None
 
         try:
@@ -224,28 +224,29 @@ class ContentItemMetaClass(PolymorphicModelBase):
                     ] = new_class._meta.db_table
 
             # Enforce good manners. The name is often not visible, except for the delete page.
-            if not new_class._meta.abstract:
-                if (
+            if not new_class._meta.abstract and (
+                (
                     not hasattr(new_class, "__str__")
                     or new_class.__str__ == ContentItem.__str__
-                ):
-                    if PY3:
+                )
+            ):
+                if PY3:
+                    raise TypeError(
+                        "The {0} class should implement a __str__() function.".format(
+                            name
+                        )
+                    )
+                else:
+                    # The first check is for python_2_unicode_compatible tricks, also check for __unicode__ only.
+                    if (
+                        not hasattr(new_class, "__unicode__")
+                        or new_class.__unicode__ == ContentItem.__unicode__
+                    ):
                         raise TypeError(
-                            "The {0} class should implement a __str__() function.".format(
+                            "The {0} class should implement a __unicode__() or __str__() function.".format(
                                 name
                             )
                         )
-                    else:
-                        # The first check is for python_2_unicode_compatible tricks, also check for __unicode__ only.
-                        if (
-                            not hasattr(new_class, "__unicode__")
-                            or new_class.__unicode__ == ContentItem.__unicode__
-                        ):
-                            raise TypeError(
-                                "The {0} class should implement a __unicode__() or __str__() function.".format(
-                                    name
-                                )
-                            )
 
         return new_class
 
@@ -365,11 +366,7 @@ class ContentItem(
         except ContentType.DoesNotExist:
             real_type_text = "(type deleted)"
         else:
-            if real_type is None:
-                real_type_text = "(type deleted)"
-            else:
-                real_type_text = "(type deleted)"
-
+            real_type_text = "(type deleted)"
         return "'{type} {id:d}' in '{language} {placeholder}'".format(
             type=real_type_text,
             id=self.id or 0,

@@ -53,8 +53,8 @@ if appsettings.FLUENT_MARKUP_USE_DJANGO_MARKUP:
     # NOTE: the enhanced markdown above will also be replaced. Use the MARKUP_SETTINGS setting to configure django-markup instead.
     from django_markup.markup import formatter
 
+    real_filters = list(SUPPORTED_LANGUAGES.keys()) + ["creole"]
     for filter_name, FilterClass in formatter.filter_list.items():
-        real_filters = list(SUPPORTED_LANGUAGES.keys()) + ["creole"]
         if filter_name in real_filters:
             _languageNames[filter_name] = FilterClass.title
             SUPPORTED_LANGUAGES[filter_name] = lambda text: mark_safe(

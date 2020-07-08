@@ -57,9 +57,7 @@ def _create_markup_plugin(language, model):
     )
 
     classname = "{0}MarkupPlugin".format(language.capitalize())
-    PluginClass = type(classname, (MarkupPluginBase,), {"model": model, "form": form})
-
-    return PluginClass
+    return type(classname, (MarkupPluginBase,), {"model": model, "form": form})
 
 
 # Dynamically create plugins for every language type.

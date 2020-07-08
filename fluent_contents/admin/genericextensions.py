@@ -56,8 +56,9 @@ class BaseInitialGenericInlineFormSet(BaseGenericInlineFormSet):
             if instance:
                 kwargs["instance"] = instance
 
-        form = super(BaseInitialGenericInlineFormSet, self)._construct_form(i, **kwargs)
-        return form
+        return super(BaseInitialGenericInlineFormSet, self)._construct_form(
+            i, **kwargs
+        )
 
     def __initial_minus_queryset(self):
         """
@@ -67,11 +68,7 @@ class BaseInitialGenericInlineFormSet(BaseGenericInlineFormSet):
         queryset = self.get_queryset()
 
         def initial_not_in_queryset(initial):
-            for x in queryset:
-                if x.slot == initial["slot"]:
-                    return False
-
-            return True
+            return all(x.slot != initial["slot"] for x in queryset)
 
         return list(filter(initial_not_in_queryset, self._initial))
 
